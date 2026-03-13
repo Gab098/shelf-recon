@@ -32,15 +32,9 @@ function envError() {
 // Consumers will get a clear error only when they actually call into Shopify helpers.
 function stubShopify() {
   const err = envError();
-  const stub = new Proxy(
-    {},
-    {
-      get() {
-        throw err;
-      },
-    },
-  );
-  return stub as any;
+  // We keep `default export` as a stub for debugging, but we *must not* access properties
+  // on it at import-time, otherwise it would still crash the app on Vercel.
+  return { __error: err } as any;
 }
 
 const shopify =
@@ -108,8 +102,29 @@ const shopify =
 export default shopify;
 
 export const apiVersion = ApiVersion.July25;
-export const addDocumentResponseHeaders = shopify.addDocumentResponseHeaders;
-export const authenticate = shopify.authenticate;
-export const unauthenticated = shopify.unauthenticated;
-export const registerWebhooks = shopify.registerWebhooks;
-export const sessionStorage = shopify.sessionStorage;
+
+const missingEnvError = missingEnv.length > 0 ? envError() : null;
+
+const stubAuthenticate = {
+  admin: async () => {
+    throw missingEnvError;
+  },
+  public: async () => {
+    throw missingEnvError;
+  },
+  webhook: async () => {
+    throw missingEnvError;
+  },
+} as any;
+
+export const addDocumentResponseHeaders =
+  missingEnv.length > 0 ? (() => {}) : (shopify as any).addDocumentResponseHeaders;
+export const authenticate = missingEnv.length > 0 ? stubAuthenticate : (shopify as any).authenticate;
+export const unauthenticated = missingEnv.length > 0 ? ({} as any) : (shopify as any).unauthenticated;
+export const registerWebhooks =
+  missingEnv.length > 0
+    ? (async () => {
+        throw missingEnvError;
+      })
+    : (shopify as any).registerWebhooks;
+export const sessionStorage = missingEnv.length > 0 ? ({} as any) : (shopify as any).sessionStorage;
