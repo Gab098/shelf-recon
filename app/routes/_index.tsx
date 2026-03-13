@@ -13,6 +13,7 @@ import {
   Text,
   TextField,
 } from "@shopify/polaris";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 
 import type { loader as rootLoader } from "~/root";
@@ -37,7 +38,11 @@ export async function action({ request }: ActionFunctionArgs) {
   const raw = { shop: String(fd.get("shop") ?? "") };
   const parsed = Schema.safeParse(raw);
   if (!parsed.success) {
-    return { ok: false as const, error: parsed.error.issues[0]?.message ?? "Shop non valido" };
+    return {
+      ok: false as const,
+      error: parsed.error.issues[0]?.message ?? "Shop non valido",
+      shop: raw.shop,
+    };
   }
   return redirect(`/auth?shop=${encodeURIComponent(parsed.data.shop)}`);
 }
@@ -47,6 +52,13 @@ export default function Index() {
   const actionData = useActionData<typeof action>();
   const rootData = useRouteLoaderData<typeof rootLoader>("root");
   const missingEnv = rootData?.missingEnv ?? [];
+  const [shop, setShop] = useState("");
+
+  useEffect(() => {
+    if (actionData && (actionData as any).ok === false && typeof (actionData as any).shop === "string") {
+      setShop((actionData as any).shop);
+    }
+  }, [actionData]);
 
   return (
     <Page fullWidth>
@@ -117,6 +129,8 @@ export default function Index() {
                         autoComplete="off"
                         placeholder="mystore.myshopify.com"
                         helpText="Puoi scrivere anche solo: mystore"
+                        value={shop}
+                        onChange={setShop}
                         error={actionData && !actionData.ok ? actionData.error : undefined}
                       />
                       <Button submit variant="primary" loading={nav.state !== "idle"}>
