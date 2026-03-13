@@ -13,9 +13,12 @@ import { db } from "~/db.server";
 import { PLAN_AGENCY, PLAN_GROWTH, PLAN_PRO } from "~/consts/plans";
 
 const requiredEnv = ["SHOPIFY_API_KEY", "SHOPIFY_API_SECRET", "SHOPIFY_APP_URL", "DATABASE_URL"] as const;
-const missingEnv = requiredEnv.filter((k) => !process.env[k] || String(process.env[k]).trim().length === 0);
+const missingEnv = requiredEnv.filter((k) => !process.env[k] || String(process.env[k]).trim().length === 0) as string[];
 
-const scopes = (process.env.SHOPIFY_SCOPES ?? process.env.SCOPES ?? "")
+const scopesRaw = (process.env.SHOPIFY_SCOPES ?? process.env.SCOPES ?? "").trim();
+if (!scopesRaw) missingEnv.push("SHOPIFY_SCOPES");
+
+const scopes = scopesRaw
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);

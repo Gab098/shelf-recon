@@ -14,7 +14,9 @@ export const links: LinksFunction = () => [
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const required = ["SHOPIFY_API_KEY", "SHOPIFY_API_SECRET", "SHOPIFY_APP_URL", "DATABASE_URL"] as const;
-  const missingEnv = required.filter((k) => !process.env[k] || String(process.env[k]).trim().length === 0);
+  const missingEnv = required.filter((k) => !process.env[k] || String(process.env[k]).trim().length === 0) as string[];
+  const scopesRaw = (process.env.SHOPIFY_SCOPES ?? process.env.SCOPES ?? "").trim();
+  if (!scopesRaw) missingEnv.push("SHOPIFY_SCOPES");
 
   return {
     // Useful for marketing-style pages too.
