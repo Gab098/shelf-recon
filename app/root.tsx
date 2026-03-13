@@ -20,11 +20,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     // Useful for marketing-style pages too.
     canonical: url.origin,
     missingEnv,
+    // `/app` routes already wrap with Shopify's AppProvider (which includes Polaris).
+    wrapWithPolaris: !url.pathname.startsWith("/app"),
   };
 }
 
 export default function App() {
-  const { canonical } = useLoaderData<typeof loader>();
+  const { canonical, wrapWithPolaris } = useLoaderData<typeof loader>();
 
   return (
     <html lang="it" className="dark">
@@ -43,10 +45,14 @@ export default function App() {
       </head>
       <body>
         <div className="sr-grid min-h-screen">
-          {/* Polaris components require this context even on non-embedded routes (like `/`). */}
-          <PolarisAppProvider i18n={polarisEn} theme="dark-experimental">
+          {/* Polaris components require this context on non-embedded routes (like `/`). */}
+          {wrapWithPolaris ? (
+            <PolarisAppProvider i18n={polarisEn} theme="dark-experimental">
+              <Outlet />
+            </PolarisAppProvider>
+          ) : (
             <Outlet />
-          </PolarisAppProvider>
+          )}
         </div>
         <ScrollRestoration />
         <Scripts />

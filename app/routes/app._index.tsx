@@ -8,6 +8,7 @@ import { db } from "~/db.server";
 import { PRODUCTS_COUNT_QUERY } from "~/graphql/admin";
 import { authenticate } from "~/shopify.server";
 import type { AppOutletContext } from "~/routes/app-context";
+import { ProcioneAvatar } from "~/components/ProcioneAvatar";
 import { countReconRunsThisMonth, getShopSettings } from "~/models/recon.server";
 
 async function adminGraphql<T>(admin: any, query: string, variables?: any): Promise<T> {
@@ -54,7 +55,7 @@ export default function Dashboard() {
     <Page fullWidth>
       <div className="mx-auto max-w-6xl py-6">
         <BlockStack gap="500">
-          <div className="sr-panel p-6">
+          <div className="sr-panel sr-heroPanel p-6">
             <InlineStack align="space-between" blockAlign="center" gap="400">
               <div>
                 <Text as="h1" variant="heading2xl">
@@ -63,6 +64,9 @@ export default function Dashboard() {
                 <Text as="p" tone="subdued">
                   Benvenuto, {shopName}. Recon e' pronto a frugare nel tuo store 🦝
                 </Text>
+                <div className="mt-4">
+                  <ProcioneAvatar subtitle={`Piano attivo: ${activePlan}`} />
+                </div>
               </div>
               <InlineStack gap="200" blockAlign="center">
                 <Badge tone={activePlan === "Free" ? "warning" : "success"}>{activePlan}</Badge>

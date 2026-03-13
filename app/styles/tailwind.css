@@ -30,6 +30,7 @@ body {
 
 /* Subtle grid texture for that cyberpunk vibe */
 .sr-grid {
+  position: relative;
   background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
@@ -37,11 +38,51 @@ body {
   mask-image: radial-gradient(circle at 40% 0%, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0) 75%);
 }
 
+.sr-grid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02) 0px,
+    rgba(255, 255, 255, 0.02) 1px,
+    transparent 2px,
+    transparent 6px
+  );
+  opacity: 0.30;
+  mix-blend-mode: overlay;
+}
+
 .sr-panel {
   background: var(--sr-panel);
   border: 1px solid var(--sr-panelBorder);
   box-shadow: 0 0 0 1px rgba(0, 255, 136, 0.08), 0 10px 40px rgba(0, 0, 0, 0.45);
   border-radius: 16px;
+}
+
+.sr-heroPanel {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.sr-heroPanel::before {
+  content: "";
+  position: absolute;
+  inset: -80px;
+  background:
+    radial-gradient(380px 260px at 18% 10%, rgba(0, 255, 136, 0.22), transparent 60%),
+    radial-gradient(420px 280px at 82% 0%, rgba(139, 92, 246, 0.22), transparent 60%),
+    radial-gradient(260px 200px at 60% 90%, rgba(255, 107, 53, 0.12), transparent 70%);
+  filter: blur(2px);
+  opacity: 0.95;
+  z-index: 0;
+}
+
+.sr-heroPanel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .sr-neonText {
@@ -57,4 +98,3 @@ body {
 html.dark {
   color-scheme: dark;
 }
-
