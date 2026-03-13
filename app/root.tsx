@@ -1,6 +1,8 @@
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "@remix-run/react";
 
+import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
+import polarisEn from "@shopify/polaris/locales/en.json";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
 import tailwindStyles from "~/styles/tailwind.css?url";
 
@@ -41,7 +43,10 @@ export default function App() {
       </head>
       <body>
         <div className="sr-grid min-h-screen">
-          <Outlet />
+          {/* Polaris components require this context even on non-embedded routes (like `/`). */}
+          <PolarisAppProvider i18n={polarisEn} theme="dark-experimental">
+            <Outlet />
+          </PolarisAppProvider>
         </div>
         <ScrollRestoration />
         <Scripts />
