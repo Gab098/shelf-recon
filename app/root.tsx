@@ -4,7 +4,6 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
 import tailwindStyles from "~/styles/tailwind.css?url";
 
-
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: polarisStyles },
   { rel: "stylesheet", href: tailwindStyles },
@@ -12,9 +11,13 @@ export const links: LinksFunction = () => [
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
+  const required = ["SHOPIFY_API_KEY", "SHOPIFY_API_SECRET", "SHOPIFY_APP_URL", "DATABASE_URL"] as const;
+  const missingEnv = required.filter((k) => !process.env[k] || String(process.env[k]).trim().length === 0);
+
   return {
     // Useful for marketing-style pages too.
     canonical: url.origin,
+    missingEnv,
   };
 }
 

@@ -1,9 +1,10 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, useActionData, useNavigation } from "@remix-run/react";
-import { BlockStack, Button, Card, FormLayout, Page, Text, TextField } from "@shopify/polaris";
+import { Form, useActionData, useNavigation, useRouteLoaderData } from "@remix-run/react";
+import { Banner, BlockStack, Button, Card, FormLayout, Page, Text, TextField } from "@shopify/polaris";
 import { z } from "zod";
 
+import type { loader as rootLoader } from "~/root";
 import { RaccoonReconLogo } from "~/components/RaccoonReconLogo";
 
 const Schema = z.object({
@@ -33,12 +34,28 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Index() {
   const nav = useNavigation();
   const actionData = useActionData<typeof action>();
+  const rootData = useRouteLoaderData<typeof rootLoader>("root");
+  const missingEnv = rootData?.missingEnv ?? [];
 
   return (
     <Page fullWidth>
       <div className="mx-auto max-w-3xl py-10">
         <div className="sr-panel p-8">
           <BlockStack gap="500">
+            {missingEnv.length > 0 ? (
+              <Banner
+                title="Config mancante su server"
+                tone="warning"
+              >
+                <Text as="p" variant="bodyMd">
+                  Recon non puo' partire: mancano queste variabili d'ambiente su Vercel.
+                </Text>
+                <Text as="p" variant="bodySm" tone="subdued">
+                  {missingEnv.join(", ")}
+                </Text>
+              </Banner>
+            ) : null}
+
             <div className="flex items-center gap-4">
               <div className="animate-glowPulse">
                 <RaccoonReconLogo size={56} />
@@ -85,4 +102,3 @@ export default function Index() {
     </Page>
   );
 }
-
