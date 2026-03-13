@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // Use a non-pooled connection string for Prisma Migrate.
+  // Neon (and other serverless Postgres) often recommend separate "direct" URLs.
+  directUrl = env("DIRECT_URL")
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+}
+
+model ShopSettings {
+  shop                 String   @id
+  detectedNiche        String?
+  detectedSubniches    String?
+  personalitySarcasmOn Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+enum ReconRunKind {
+  full_scan
+  market_recon
+  product_creator
+  landing_generator
+}
+
+model ReconRun {
+  id        String      @id @default(cuid())
+  shop      String
+  kind      ReconRunKind
+  createdAt DateTime    @default(now())
+
+  @@index([shop, kind, createdAt])
+}
+
+enum ProductReconStatus {
+  good
+  attention
+  problem
+}
+
+model ProductRecon {
+  id          String            @id @default(cuid())
+  shop        String
+  productId   String
+  title       String
+  price       String?
+  stock       Int?
+  aiCategory  String?
+  score       Int?
+  status      ProductReconStatus?
+  suggestion  String?
+  rawJson     Json?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([shop, productId, createdAt])
+}
+
+enum MarketInsightKind {
+  pain_point
+  trend
+  opportunity
+}
+
+model MarketInsight {
+  id        String           @id @default(cuid())
+  shop      String
+  niche     String
+  kind      MarketInsightKind
+  title     String
+  detail    String
+  sources   Json?
+  rawJson   Json?
+  createdAt DateTime         @default(now())
+
+  @@index([shop, kind, createdAt])
+}

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["@remix-run/node", "vite/client"],
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "resolveJsonModule": true,
+    "allowJs": false,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["app/*"]
+    }
+  },
+  "include": ["app/**/*.ts", "app/**/*.tsx", "env.d.ts", "vite.config.ts", "tailwind.config.ts", "remix.config.js"]
+}
+
